@@ -1,0 +1,38 @@
+<?php
+
+use App\Http\Controllers\AmenityController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Web\backend\abdullah\PropertyController;
+
+
+
+
+// ================= Property Management =================
+Route::prefix('admin/properties')->name('admin.property.')->group(function () {
+    Route::get('/', [PropertyController::class, 'index'])->name('index');
+    Route::get('/create', [PropertyController::class, 'create'])->name('create');
+    Route::post('/store', [PropertyController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [PropertyController::class, 'edit'])->name('edit');
+    Route::put('/update/{id}', [PropertyController::class, 'update'])->name('update');
+    Route::delete('/destroy/{id}', [PropertyController::class, 'destroy'])->name('destroy');
+    Route::get('/show/{id}', [PropertyController::class, 'show'])->name('show');
+});
+// =======================================================
+
+
+// ================= Amenity Management =================
+Route::prefix('admin/amenities')->name('admin.amenity.')->group(function () {
+    Route::get('/', [AmenityController::class, 'index'])->name('index');
+    Route::get('/create', [AmenityController::class, 'create'])->name('create');
+    Route::post('/store', [AmenityController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [AmenityController::class, 'edit'])->name('edit');
+    Route::put('/update/{id}', [AmenityController::class, 'update'])->name('update');
+    Route::delete('/destroy/{id}', [AmenityController::class, 'destroy'])->name('destroy');
+    
+});
+// =======================================================
+
+
+
+
+
