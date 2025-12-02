@@ -72,14 +72,12 @@
 										<div class="dropdown d-md-flex profile-1">
 											<a href="#" data-bs-toggle="dropdown" class="nav-link pe-2 leading-none d-flex animate">
 												<span>
-													<img src="{{ Auth::user()->profile_photo_path 
-                                                    ? asset(Auth::user()->profile_photo_path) 
-                                                    : asset('admin/assets/images/faces/default.jpg') }}" 
+													<img src="{{ auth()->user()?->profile_photo_url ?? asset('default-user.png') }}"
                                                     alt="profile-user" 
                                                     class="avatar profile-user brround cover-image">
 												</span>
 												<div class="text-center p-1 d-flex d-lg-none-max">
-													<h6 class="mb-0" id="profile-heading">{{Auth::user()->name}}<i class="user-angle ms-1 fa fa-angle-down "></i></h6>
+													<h6 class="mb-0" id="profile-heading">{{Auth::user()->name??'User'}}<i class="user-angle ms-1 fa fa-angle-down "></i></h6>
 												</div>
 
 											</a>

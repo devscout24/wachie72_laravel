@@ -51,6 +51,12 @@
                         <input type="number" name="price" step="0.01" class="form-control" required>
                     </div>
 
+                    <!-- CLEANING FEE -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Cleaning Fee ($)</label>
+                        <input type="number" name="cleaning_fee" step="0.01" class="form-control">
+                    </div>
+
                     <!-- BEDROOMS -->
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Bedrooms</label>

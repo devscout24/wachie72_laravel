@@ -23,6 +23,7 @@ class PropertyController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
 
+
                 ->addColumn('id', function ($row) {
                     return $row->id;
                 })
@@ -41,6 +42,10 @@ class PropertyController extends Controller
 
                 ->addColumn('price', function ($row) {
                     return '$' . number_format($row->price, 2);
+                })
+
+                ->addColumn('cleaning_fee', function ($row) {
+                    return '$' . number_format($row->cleaning_fee, 2);
                 })
 
                 ->addColumn('status', function ($row) {
@@ -74,7 +79,6 @@ class PropertyController extends Controller
                     return Str::limit(strip_tags($row->description), 30);
                 })
 
-
                 ->addColumn('action', function ($row) {
                     return '
                     <a href="' . route('admin.property.edit', $row->id) . '" class="btn btn-sm btn-primary">Edit</a>
@@ -91,6 +95,8 @@ class PropertyController extends Controller
     }
 
 
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -99,12 +105,13 @@ class PropertyController extends Controller
             'price' => 'required|numeric',
             'amenity_id' => 'nullable|array', // optional
             'amenity_id.*' => 'exists:amenities,id', // validate each ID
+            'cleaning_fee' => 'nullable|numeric',
             'main_image.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
             'multiple_image.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
         ]);
 
         $data = $request->except('main_image', 'multiple_image', 'amenity_id');
-        $data['user_id'] = auth()->id();
+        $data['user_id'] = auth()->id() ?? 1;
 
         // Handle MAIN IMAGES
         $mainImages = [];
@@ -182,6 +189,7 @@ class PropertyController extends Controller
             'title' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'price' => 'required|numeric',
+            'cleaning_fee' => 'nullable|numeric',
             'main_image.*' => 'nullable|image',
             'multiple_image.*' => 'nullable|image',
             'amenity_id' => 'nullable|array',

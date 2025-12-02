@@ -17,6 +17,7 @@
                         <th>Title</th>
                         <th>Location</th>
                         <th>Price</th>
+                        <th>Cleaning Fee</th>
                         <th>Beds</th>
                         <th>Baths</th>
                         <th>Guests</th>
@@ -68,6 +69,9 @@
                     },
                     {
                         data: 'price'
+                    },
+                    {
+                        data: 'cleaning_fee'
                     },
                     {
                         data: 'bedrooms'

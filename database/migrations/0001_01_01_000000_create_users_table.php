@@ -22,6 +22,11 @@ return new class extends Migration
             $table->foreignId('current_team_id')->nullable();
             $table->string('image', 2048)->nullable();
 
+            $table->string('username')->unique()->nullable();
+            $table->string('city')->nullable();
+            $table->string('country')->nullable();
+            $table->string('avatar')->nullable();
+            $table->boolean('is_active')->default(1)->nullable();
 
             // FIX: Add this column
             $table->string('profile_photo_path', 2048)->nullable();
