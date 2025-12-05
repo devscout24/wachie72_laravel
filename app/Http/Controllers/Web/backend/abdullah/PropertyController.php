@@ -52,16 +52,6 @@ class PropertyController extends Controller
                     return $row->status == 1 ? 'Active' : 'Inactive';
                 })
 
-                ->addColumn('image', function ($row) {
-                    $mainImages = $row->main_image;
-                    if (is_string($mainImages)) $mainImages = json_decode($mainImages, true);
-
-                    if ($mainImages && is_array($mainImages) && count($mainImages) > 0) {
-                        // Only the first image
-                        return '<img src="' . asset($mainImages[0]) . '" style="width:60px;height:40px;object-fit:cover;">';
-                    }
-                    return 'No Image';
-                })
 
                 ->addColumn('multiple_image', function ($row) {
                     $multiImages = $row->multiple_image;
@@ -106,23 +96,13 @@ class PropertyController extends Controller
             'amenity_id' => 'nullable|array', // optional
             'amenity_id.*' => 'exists:amenities,id', // validate each ID
             'cleaning_fee' => 'nullable|numeric',
-            'main_image.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
             'multiple_image.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
         ]);
 
-        $data = $request->except('main_image', 'multiple_image', 'amenity_id');
+        $data = $request->except( 'multiple_image', 'amenity_id');
         $data['user_id'] = auth()->id() ?? 1;
 
-        // Handle MAIN IMAGES
-        $mainImages = [];
-        if ($request->hasFile('main_image')) {
-            foreach ($request->file('main_image') as $file) {
-                $filename = 'uploads/properties/' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/properties'), basename($filename));
-                $mainImages[] = $filename;
-            }
-        }
-        $data['main_image'] = $mainImages;
+
 
         // Handle MULTIPLE IMAGES
         $multiImages = [];
@@ -160,10 +140,6 @@ class PropertyController extends Controller
         // Eager load amenities
         $property = Property::with('amenities')->findOrFail($id);
 
-        // Decode JSON fields to arrays if needed
-        $property->main_image = is_string($property->main_image)
-            ? json_decode($property->main_image, true)
-            : ($property->main_image ?? []);
 
         $property->multiple_image = is_string($property->multiple_image)
             ? json_decode($property->multiple_image, true)
@@ -190,7 +166,6 @@ class PropertyController extends Controller
             'location' => 'required|string|max:255',
             'price' => 'required|numeric',
             'cleaning_fee' => 'nullable|numeric',
-            'main_image.*' => 'nullable|image',
             'multiple_image.*' => 'nullable|image',
             'amenity_id' => 'nullable|array',
             'amenity_id.*' => 'integer|exists:amenities,id',
@@ -199,16 +174,6 @@ class PropertyController extends Controller
         $data = $request->except(['main_image', 'multiple_image', 'amenity_id']);
         $property->update($data);
 
-        // Update main images
-        if ($request->hasFile('main_image')) {
-            $mainArr = [];
-            foreach ($request->file('main_image') as $file) {
-                $name = 'uploads/properties/' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/properties'), basename($name));
-                $mainArr[] = $name;
-            }
-            $property->main_image = $mainArr;
-        }
 
         // Update multiple images
         if ($request->hasFile('multiple_image')) {

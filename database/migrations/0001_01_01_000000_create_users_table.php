@@ -28,7 +28,10 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->boolean('is_active')->default(1)->nullable();
 
-            // FIX: Add this column
+            $table->string('otp')->nullable();
+            $table->timestamp('otp_created_at')->nullable();
+
+            
             $table->string('profile_photo_path', 2048)->nullable();
             $table->timestamps();
         });

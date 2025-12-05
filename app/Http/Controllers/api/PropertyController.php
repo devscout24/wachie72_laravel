@@ -21,15 +21,15 @@ class PropertyController extends Controller
             ->get()
             ->map(function ($item) {
 
-                // Convert main_image to full URLs
-                $item->main_image = collect($item->main_image)->map(function ($img) {
-                    return asset($img);
-                });
+                // --- FIX: Decode if stored as JSON string ---
+                $multipleImages = is_string($item->multiple_image)
+                    ? json_decode($item->multiple_image, true)
+                    : ($item->multiple_image ?? []);
 
-                // Convert multiple_image to full URLs
-                $item->multiple_image = collect($item->multiple_image)->map(function ($img) {
-                    return asset($img);
-                });
+                // --- Convert to full URL ---
+                $item->multiple_image = collect($multipleImages)
+                    ->map(fn($img) => asset('uploads/properties/' . basename($img)))
+                    ->values();
 
                 return $item;
             });
@@ -40,6 +40,7 @@ class PropertyController extends Controller
             'message' => 'Properties retrieved successfully'
         ]);
     }
+
 
     public function getone($id)
     {
@@ -52,19 +53,16 @@ class PropertyController extends Controller
             ], 404);
         }
 
-        // --- FIX: Decode JSON correctly ---
-        $mainImages = is_string($property->main_image)
-            ? json_decode($property->main_image, true)
-            : ($property->main_image ?? []);
-
+        // --- FIX JSON IMAGE FIELDS ---
+        // Always decode if saved as string
         $multipleImages = is_string($property->multiple_image)
             ? json_decode($property->multiple_image, true)
             : ($property->multiple_image ?? []);
 
-        // Convert to full URL
-        $property->main_image = collect($mainImages)->map(fn($img) => asset($img));
-
-        $property->multiple_image = collect($multipleImages)->map(fn($img) => asset($img));
+        // Convert each image path to full URL
+        $property->multiple_image = collect($multipleImages)
+            ->map(fn($img) => asset($img))
+            ->values(); // reset index (optional)
 
         return response()->json([
             'success' => true,
@@ -72,7 +70,4 @@ class PropertyController extends Controller
             'message' => 'Property retrieved successfully'
         ]);
     }
-
-
-
 }

@@ -13,24 +13,7 @@
                 @method('PUT') {{-- ✅ Correct method --}}
 
                 <div class="row">
-                    {{-- Main Images --}}
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Main Image <small>(Multiple Allowed)</small></label>
-                        <input type="file" name="main_image[]" class="form-control" multiple>
-                        <div class="mt-2">
-                            @php
-                                $mainImages = is_string($property->main_image)
-                                    ? json_decode($property->main_image)
-                                    : $property->main_image;
-                            @endphp
-
-                            @if ($mainImages)
-                                @foreach ($mainImages as $img)
-                                    <img src="{{ asset($img) }}" class="img-thumbnail me-1 mb-1" width="80">
-                                @endforeach
-                            @endif
-                        </div>
-                    </div>
+      
 
                     {{-- Multiple Images --}}
                     <div class="col-md-6 mb-3">

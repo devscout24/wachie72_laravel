@@ -78,37 +78,39 @@ class TeamController extends Controller
         return view('admin.team.edit', compact('team'));
     }
 
+
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'designation' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'bio' => 'nullable|string',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'bio'         => 'nullable|string',
         ]);
 
         $team = Team::findOrFail($id);
+
         $team->name = $request->name;
         $team->designation = $request->designation;
         $team->bio = $request->bio;
+
         if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
+            $imageName = time().'.'.$request->image->extension();
             $request->image->move(public_path('images/teams'), $imageName);
-            $team->image = 'images/teams/' . $imageName;
+            $team->image = 'images/teams/'.$imageName;
         }
 
-        $team->is_active = $request->has('is_active') ? 1 : 0;
+        $team->is_active = $request->is_active; // FIXED
 
         $team->save();
 
         return redirect()->route('admin.team.index')->with('success', 'Team member updated successfully.');
     }
 
-    public function destroy($id)
-    {
-        $team = Team::findOrFail($id);
-        $team->delete();
 
-        return redirect()->route('admin.team.index')->with('success', 'Team member deleted successfully.');
+    public function delete($id)
+    {
+        Team::findOrFail($id)->delete();
+        return redirect()->back()->with('success', 'Team member deleted successfully.');
     }
 }

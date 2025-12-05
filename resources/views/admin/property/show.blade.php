@@ -9,18 +9,6 @@
 <div class="card">
     <div class="card-body">
 
-        <div class="row mb-3">
-            <div class="col-md-3"><strong>Main Images:</strong></div>
-            <div class="col-md-9">
-                @if($property->main_image && count($property->main_image) > 0)
-                    @foreach($property->main_image as $img)
-                        <img src="{{ asset($img) }}" style="width:200px; height:120px; object-fit:cover; margin-right:5px; margin-bottom:5px;">
-                    @endforeach
-                @else
-                    No Images
-                @endif
-            </div>
-        </div>
 
         <div class="row mb-3">
             <div class="col-md-3"><strong>Multiple Images:</strong></div>

@@ -30,10 +30,18 @@ class BookingController extends Controller
         // Get property
         $property = Property::findOrFail($request->property_id);
 
-        // Calculate days using Carbon
+        // Calculate days
         $startDate = Carbon::parse($request->start_date);
         $endDate   = Carbon::parse($request->end_date);
         $days      = $startDate->diffInDays($endDate);
+
+        // 🔥 Minimum 3 days required
+        if ($days < 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Minimum booking duration is 3 days.'
+            ], 422);
+        }
 
         // Calculate total price
         $totalPrice = ($days * $property->price) + $property->cleaning_fee;
@@ -53,6 +61,7 @@ class BookingController extends Controller
             'message' => 'Booking created successfully'
         ], 201);
     }
+
 
     public function getAll()
     {

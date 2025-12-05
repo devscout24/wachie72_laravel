@@ -49,6 +49,7 @@ class DatabaseSeeder extends Seeder
             AmenitySeeder::class,
             PropertySeeder::class,
             PropertyAmenitySeeder::class,
+            TeamSeeder::class,
         ]);
     }
 }

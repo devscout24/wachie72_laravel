@@ -14,14 +14,7 @@
 
                 <div class="row">
 
-                    <!-- MAIN IMAGE -->
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Main Image <small class="text-muted">(Multiple Allowed)</small></label>
-                        <input type="file" name="main_image[]" class="form-control" multiple>
-                        @error('main_image.*')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
+            
 
                     <!-- MULTIPLE IMAGES -->
                     <div class="col-md-6 mb-3">

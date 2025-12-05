@@ -12,7 +12,6 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Main Image</th>
                         <th>Multiple Image</th>
                         <th>Title</th>
                         <th>Location</th>
@@ -51,11 +50,7 @@
                         searchable: false,
                         orderable: false
                     },
-                    {
-                        data: 'image',
-                        orderable: false,
-                        searchable: false
-                    },
+
                     {
                         data: 'multiple_image',
                         orderable: false,

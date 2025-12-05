@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 use App\Traits\apiresponse;
 
 class UserAuthBDController extends Controller
@@ -34,19 +35,32 @@ class UserAuthBDController extends Controller
             return $this->error([], $validator->errors(), 422);
         }
 
-        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $request->email)->first();
 
-        if (!$token = JWTAuth::attempt($credentials)) {
-            return $this->error([], 'Unauthorized. Please check your credentials.', 401);
+        if (!$user) {
+            return $this->error([], 'Unauthorized. User not found.', 401);
         }
 
-        $user = auth()->user();
+        // Ensure raw passwords (from direct DB insert) can be used for first login
+        if (!Hash::check($request->password, $user->password)) {
+            // Check if password is stored as plain text (for old users)
+            if ($user->password === $request->password) {
+                // Hash the password automatically for future logins
+                $user->password = Hash::make($request->password);
+                $user->save();
+            } else {
+                return $this->error([], 'Unauthorized. Please check your credentials.', 401);
+            }
+        }
+
+        $token = JWTAuth::fromUser($user);
 
         return $this->success([
             'user'  => $this->formatUser($user),
             'token' => $this->respondWithToken($token)
         ], 'Login successful.', 200);
     }
+
 
     // -------------------------
     // REGISTRATION
@@ -62,11 +76,11 @@ class UserAuthBDController extends Controller
             'name'      => 'required|string|max:255',
             'email'     => 'required|string|email|max:255|unique:users',
             'password'  => 'required|string|min:6|confirmed', // now works
-            'surname'   => 'nullable|string|max:255',
-            'username'  => 'nullable|string|max:255|unique:users,username',
+            // 'surname'   => 'nullable|string|max:255',
+            // 'username'  => 'nullable|string|max:255|unique:users,username',
             'phone'     => 'nullable|string|max:20',
-            'country'   => 'nullable|string|max:255',
-            'city'      => 'nullable|string|max:255',
+            // 'country'   => 'nullable|string|max:255',
+            // 'city'      => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -131,7 +145,7 @@ class UserAuthBDController extends Controller
     }
 
 
-     public function forgetPassword(Request $request)
+    public function forgetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
@@ -151,7 +165,7 @@ class UserAuthBDController extends Controller
 
         \Log::info('Forget password initiated:', ['email' => $user->email]);
 
-        return $this->success([], 'OTP sent successfully. Please check your email.', 200);
+        return $this->success(['otp' => $user->otp], 'OTP sent successfully. Please check your email.', 200);
     }
 
     public function verifyOtp(Request $request)
@@ -190,8 +204,13 @@ class UserAuthBDController extends Controller
         return $this->success([], 'OTP verified successfully. You can now reset your password.', 200);
     }
 
+
     public function resetPassword(Request $request)
     {
+        $request->merge([
+            'password_confirmation' => $request->password_confirmation ?? $request->confirmed_password ?? null,
+        ]);
+
         $validator = Validator::make($request->all(), [
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -210,26 +229,20 @@ class UserAuthBDController extends Controller
         $user = User::find($userId);
         if (!$user) return $this->error([], 'User not found.', 404);
 
-        $newPasswordHash = Hash::make($request->password);
-
-        $updateResult = DB::table('users')
-            ->where('id', $userId)
-            ->update([
-                'password' => $newPasswordHash,
-                'otp' => null,
-                'otp_created_at' => null,
-                'updated_at' => now(),
-            ]);
-
-        if (!$updateResult) {
-            return $this->error([], 'Password reset failed.', 500);
-        }
+        // Always hash password when resetting
+        $user->password = Hash::make($request->password);
+        $user->otp = null;
+        $user->otp_created_at = null;
+        $user->save();
 
         $this->invalidateUserTokens($userId);
         $this->clearPasswordResetCache();
 
         return $this->success([], 'Password reset successfully. Please login with your new password.', 200);
     }
+
+
+
 
     public function resendOtp()
     {
@@ -333,8 +346,8 @@ class UserAuthBDController extends Controller
 
             $rules = [
                 'full_name'    => 'nullable|string|max:255',
-                'email'        => ['nullable','email', Rule::unique('users','email')->ignore($user->id,'id')],
-                'phone'        => ['nullable','string','max:20', Rule::unique('users','phone')->ignore($user->id,'id')],
+                'email'        => ['nullable', 'email', Rule::unique('users', 'email')->ignore($user->id, 'id')],
+                'phone'        => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id, 'id')],
                 'country'      => 'nullable|string|max:255',
                 'city'         => 'nullable|string|max:255',
                 'postcode'     => 'nullable|string|max:20',
@@ -349,26 +362,26 @@ class UserAuthBDController extends Controller
                 return $this->error([], $validator->errors(), 422);
             }
 
-                // Avatar upload
-        if ($request->hasFile('avatar')) {
-            $file = $request->file('avatar');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            // Avatar upload
+            if ($request->hasFile('avatar')) {
+                $file = $request->file('avatar');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-            // Save file
-            $file->move(public_path('uploads/avatar'), $filename);
+                // Save file
+                $file->move(public_path('uploads/avatar'), $filename);
 
-            // Delete old avatar only if it is a local file (not a full URL)
-            if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
-                $oldPath = public_path('uploads/avatar/' . $user->avatar);
+                // Delete old avatar only if it is a local file (not a full URL)
+                if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
+                    $oldPath = public_path('uploads/avatar/' . $user->avatar);
 
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
+                    if (file_exists($oldPath)) {
+                        @unlink($oldPath);
+                    }
                 }
-            }
 
-            // Save only file name in DB
-            $user->avatar = $filename;
-        }
+                // Save only file name in DB
+                $user->avatar = $filename;
+            }
 
 
             // Full name handling
@@ -495,22 +508,7 @@ class UserAuthBDController extends Controller
         }
     }
 
-    // protected function respondWithToken($token)
-    // {
-    //     // token is a string; expires_in in seconds
-    //     $ttl = null;
-    //     try {
-    //         $ttl = JWTAuth::factory()->getTTL(); // minutes
-    //     } catch (\Exception $e) {
-    //         $ttl = null;
-    //     }
 
-    //     return [
-    //         'access_token' => $token,
-    //         'token_type'   => 'bearer',
-    //         'expires_in'   => $ttl ? ($ttl * 60) : null,
-    //     ];
-    // }
 
     protected function respondUserWithToken($user, $token, $message)
     {
@@ -521,38 +519,5 @@ class UserAuthBDController extends Controller
         ], $message, 200);
     }
 
-    // protected function formatUser($user)
-    // {
-    //     $category = $user->category;
-
-    //     $data = [
-    //         'id'           => $user->id,
-    //         'avatar'       => $user->avatar ? asset('uploads/avatar/' . $user->avatar) : null,
-    //         'name'         => $user->name,
-    //         'full_name'    => $user->full_name,
-    //         'surname'      => $user->surname,
-    //         'username'     => $user->username,
-    //         'email'        => $user->email,
-    //         'phone'        => $user->phone,
-    //         'country'      => $user->country ?? null,
-    //         'city'         => $user->city ?? null,
-    //         'postcode'     => $user->postcode ?? null,
-    //         'messages'     => (bool) ($user->messages ?? false),
-    //         'notification' => (bool) ($user->notification ?? false),
-    //     ];
-
-    //     if ($category) {
-    //         $data['category_id'] = $category->id;
-    //         $data['category_name'] = $category->name;
-    //     }
-
-    //     return $data;
-    // }
-
-    // protected function generateUniqueUsername($name)
-    // {
-    //     $username = Str::slug($name);
-    //     $count = User::where('username', 'LIKE', "{$username}%")->count();
-    //     return $count > 0 ? "{$username}-{$count}" : $username;
-    // }
+   
 }

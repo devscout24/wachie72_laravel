@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->json('main_image')->nullable();
             $table->json('multiple_image')->nullable();
             $table->string('title');
             $table->string('location');

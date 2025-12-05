@@ -29,7 +29,6 @@ Route::prefix('admin/amenities')->name('admin.amenity.')->group(function () {
     Route::get('/edit/{id}', [AmenityController::class, 'edit'])->name('edit');
     Route::put('/update/{id}', [AmenityController::class, 'update'])->name('update');
     Route::delete('/destroy/{id}', [AmenityController::class, 'destroy'])->name('destroy');
-    
 });
 // =======================================================
 
@@ -42,9 +41,9 @@ Route::prefix('admin/teams')->name('admin.team.')->group(function () {
     Route::post('/store', [TeamController::class, 'store'])->name('store');
     Route::get('/edit/{id}', [TeamController::class, 'edit'])->name('edit');
     Route::put('/update/{id}', [TeamController::class, 'update'])->name('update');
-    Route::delete('/destroy/{id}', [TeamController::class, 'destroy'])->name('delete');
+    Route::delete('/destroy/{id}', [TeamController::class, 'delete'])->name('delete');
 });
-// =======================================================
 
+// =======================================================
 
 

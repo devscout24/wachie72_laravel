@@ -4,6 +4,8 @@ use App\Http\Controllers\api\AmenityController;
 use App\Http\Controllers\api\BookingController;
 use App\Http\Controllers\api\PropertyController;
 use App\Http\Controllers\api\ReviewsController;
+use App\Http\Controllers\api\StripeController;
+use App\Http\Controllers\api\TeamController;
 use App\Http\Controllers\api\UserAuthBDController;
 use App\Http\Controllers\API\UserAuthController;
 use Illuminate\Http\Request;
@@ -63,3 +65,16 @@ Route::get('review/index', [ReviewsController::class, 'index']);
 // Booking Routes
 Route::post('booking/store', [BookingController::class, 'store']);
 Route::get('booking/all', [BookingController::class, 'getAll']);
+
+
+// team routes can be added here
+Route::get('team/all', [TeamController::class, 'getAll']);
+Route::get('team/{id}', [TeamController::class, 'getOne']);
+
+
+// Stripe Payment Routes
+Route::get('stripe/checkout/{bookingId}', [StripeController::class, 'checkout']);
+
+Route::post('stripe/payment', [StripeController::class, 'payment']);
+Route::post('stripe/payment-booking', [StripeController::class, 'paymentBooking']);
+Route::get('stripe/success', [StripeController::class, 'success'])->name('payment.success');

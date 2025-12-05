@@ -9,22 +9,26 @@ class PropertySeeder extends Seeder
 {
     public function run(): void
     {
+        $images = [
+            'uploads/properties/6932305d72644.jpg',
+            'uploads/properties/6932305d72412.jpg'
+        ];
+
         Property::updateOrCreate(
             ['id' => 1],
             [
                 'user_id'       => 1,
-                'main_image'    => json_encode(['default-image.png']),
-                'multiple_image'=> json_encode(['default-image.png', 'default-image2.png']),
+                'multiple_image'=> json_encode($images),
                 'title'         => 'Luxury Beachside Villa',
                 'location'      => 'Cox\'s Bazar, Bangladesh',
-                'rating'        => null,
+                'rating'        => 4.8,
                 'total_reviews' => 0,
                 'price'         => 350,
                 'cleaning_fee'   => 50,
                 'bedrooms'      => 4,
                 'bathrooms'     => 3,
                 'max_guests'    => 8,
-                'amenity_id'    => null,
+                'amenity_id'    => 2,
                 'description'   => 'A beautiful luxury villa with sea view and private pool.',
                 'status'        => 1,
             ]
@@ -34,18 +38,17 @@ class PropertySeeder extends Seeder
             ['id' => 2],
             [
                 'user_id'       => 1,
-                'main_image'    => json_encode(['default-image2.png']),
-                'multiple_image'=> json_encode(['default-image.png', 'default-image2.png']),
+                'multiple_image'=> json_encode($images),
                 'title'         => 'Modern City Apartment',
                 'location'      => 'Dhaka, Bangladesh',
-                'rating'        => null,
+                'rating'        => 4.5,
                 'total_reviews' => 0,
                 'price'         => 120,
                 'cleaning_fee'   => 20,
                 'bedrooms'      => 2,
                 'bathrooms'     => 2,
                 'max_guests'    => 4,
-                'amenity_id'    => null,
+                'amenity_id'    => 3,
                 'description'   => 'Comfortable apartment with modern facilities in the heart of the city.',
                 'status'        => 1,
             ]
@@ -55,18 +58,17 @@ class PropertySeeder extends Seeder
             ['id' => 3],
             [
                 'user_id'       => 1,
-                'main_image'    => json_encode(['default-image3.png']),
-                'multiple_image'=> json_encode(['default-image3.png', 'default-image4.png']),
+                'multiple_image'=> json_encode($images),
                 'title'         => 'Cozy Cottage in the Woods',
                 'location'      => 'Chittagong, Bangladesh',
-                'rating'        => null,
+                'rating'        => 5,
                 'total_reviews' => 0,
                 'price'         => 80,
                 'cleaning_fee'   => 15,
                 'bedrooms'      => 1,
                 'bathrooms'     => 1,
                 'max_guests'    => 2,
-                'amenity_id'    => null,
+                'amenity_id'    => 4,
                 'description'   => 'A cozy cottage nestled in the woods, perfect for nature lovers.',
                 'status'        => 1,
             ]
