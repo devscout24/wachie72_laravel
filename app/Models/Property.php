@@ -23,7 +23,6 @@ class Property extends Model
     ];
 
     protected $casts = [
-        'main_image' => 'array',
         'multiple_image' => 'array',
     ];
 
@@ -40,5 +39,10 @@ class Property extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(PropertyMultipleImage::class, 'property_id');
     }
 }

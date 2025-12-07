@@ -10,7 +10,7 @@ use App\Http\Controllers\Web\backend\abdullah\PropertyController;
 
 // ================= Property Management =================
 Route::prefix('admin/properties')->name('admin.property.')->group(function () {
-    Route::get('/', [PropertyController::class, 'index'])->name('index');
+    Route::get('/index', [PropertyController::class, 'index'])->name('index');
     Route::get('/create', [PropertyController::class, 'create'])->name('create');
     Route::post('/store', [PropertyController::class, 'store'])->name('store');
     Route::get('/edit/{id}', [PropertyController::class, 'edit'])->name('edit');

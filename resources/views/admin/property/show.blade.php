@@ -9,13 +9,13 @@
 <div class="card">
     <div class="card-body">
 
-
+        {{-- Multiple Images --}}
         <div class="row mb-3">
             <div class="col-md-3"><strong>Multiple Images:</strong></div>
             <div class="col-md-9">
-                @if($property->multiple_image && count($property->multiple_image) > 0)
-                    @foreach($property->multiple_image as $img)
-                        <img src="{{ asset($img) }}" style="width:120px; height:80px; object-fit:cover; margin-right:5px; margin-bottom:5px;">
+                @if($property->images && $property->images->count() > 0)
+                    @foreach($property->images as $img)
+                        <img src="{{ asset($img->image) }}" style="width:120px; height:80px; object-fit:cover; margin-right:5px; margin-bottom:5px;">
                     @endforeach
                 @else
                     No Images
@@ -29,14 +29,18 @@
         <div class="row mb-3"><div class="col-md-3"><strong>Beds:</strong></div><div class="col-md-9">{{ $property->bedrooms }}</div></div>
         <div class="row mb-3"><div class="col-md-3"><strong>Baths:</strong></div><div class="col-md-9">{{ $property->bathrooms }}</div></div>
         <div class="row mb-3"><div class="col-md-3"><strong>Guests:</strong></div><div class="col-md-9">{{ $property->max_guests }}</div></div>
+
+        {{-- Amenities --}}
         <div class="row mb-3">
             <div class="col-md-3"><strong>Amenities:</strong></div>
             <div class="col-md-9">{{ $property->amenities->pluck('name')->implode(', ') }}</div>
         </div>
+
+        {{-- Description --}}
         <div class="row mb-3">
-    <div class="col-md-3"><strong>Description:</strong></div>
-    <div class="col-md-9">{{ strip_tags($property->description) }}</div>
-</div>
+            <div class="col-md-3"><strong>Description:</strong></div>
+            <div class="col-md-9">{!! $property->description !!}</div>
+        </div>
 
         <div class="row mb-3"><div class="col-md-3"><strong>Status:</strong></div><div class="col-md-9">{{ $property->status == 1 ? 'Active' : 'Inactive' }}</div></div>
 

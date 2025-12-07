@@ -50,6 +50,7 @@ class DatabaseSeeder extends Seeder
             PropertySeeder::class,
             PropertyAmenitySeeder::class,
             TeamSeeder::class,
+            PropertyImageSeeder::class,
         ]);
     }
 }

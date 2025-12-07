@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('multiple_image')->nullable();
             $table->string('title');
             $table->string('location');
+            $table->text('map_link')->nullable();
             $table->foreignId('rating')->nullable();
             $table->foreignId('total_reviews')->default(0)->nullable();
             $table->float('price')->default(0);
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->integer('max_guests')->default(0);
             $table->foreignId('amenity_id')->nullable();
             $table->text('description')->nullable();
+            $table->string('image')->default('default.png');
             $table->boolean('status')->default(1)->comment('1=Active,0=Inactive');
             $table->timestamps();
         });

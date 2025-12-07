@@ -21,12 +21,10 @@ class PropertyController extends Controller
             ->get()
             ->map(function ($item) {
 
-                // --- FIX: Decode if stored as JSON string ---
                 $multipleImages = is_string($item->multiple_image)
                     ? json_decode($item->multiple_image, true)
                     : ($item->multiple_image ?? []);
 
-                // --- Convert to full URL ---
                 $item->multiple_image = collect($multipleImages)
                     ->map(fn($img) => asset('uploads/properties/' . basename($img)))
                     ->values();
@@ -70,4 +68,6 @@ class PropertyController extends Controller
             'message' => 'Property retrieved successfully'
         ]);
     }
+
+    
 }

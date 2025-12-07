@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bookings', function (Blueprint $table) {
+        Schema::create('property_multiple_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained();
-            $table->foreignId('user_id')->nullable();
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->decimal('total_price', 10, 2);
+            $table->unsignedBigInteger('property_id');
+            $table->string('image')->default('default.png');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bookings');
+        Schema::dropIfExists('property_multiple_images');
     }
 };

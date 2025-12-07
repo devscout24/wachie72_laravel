@@ -10,8 +10,8 @@ class PropertySeeder extends Seeder
     public function run(): void
     {
         $images = [
-            'uploads/properties/6932305d72644.jpg',
-            'uploads/properties/6932305d72412.jpg'
+            'uploads/properties/2.jpg',
+            'uploads/properties/1.jpg'
         ];
 
         Property::updateOrCreate(
@@ -68,7 +68,7 @@ class PropertySeeder extends Seeder
                 'bedrooms'      => 1,
                 'bathrooms'     => 1,
                 'max_guests'    => 2,
-                'amenity_id'    => 4,
+                'amenity_id'    => 1,
                 'description'   => 'A cozy cottage nestled in the woods, perfect for nature lovers.',
                 'status'        => 1,
             ]
