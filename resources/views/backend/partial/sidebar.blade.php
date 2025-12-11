@@ -65,6 +65,23 @@
                           </ul>
                    </li>
 
+
+                   <li>
+                          <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon"
+                                 enable-background="new 0 0 24 24" viewBox="0 0 24 24">
+                                 <path
+                                      d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+                            </svg>
+                            <span class="side-menu__label">Team Members</span><i class="angle fa fa-angle-right"></i></a>
+                          <ul class="slide-menu">
+
+                              <li><a href="{{ route('admin.team.create') }}" class="slide-item">Create Team Member</a></li>
+                              <li><a href="{{ route('admin.team.index') }}" class="slide-item">Manage Team Members</a></li>
+                          </ul>
+                   </li>
+
+
                    <li class="slide">
                        <a class="side-menu__item" data-bs-toggle="slide" href="#">
                            <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon"
