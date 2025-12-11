@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AmenityController;
+use App\Http\Controllers\OpenAiChatController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\backend\abdullah\PropertyController;
+
 
 
 
@@ -15,7 +17,7 @@ Route::prefix('admin/properties')->name('admin.property.')->group(function () {
     Route::post('/store', [PropertyController::class, 'store'])->name('store');
     Route::get('/edit/{id}', [PropertyController::class, 'edit'])->name('edit');
     Route::put('/update/{id}', [PropertyController::class, 'update'])->name('update');
-    Route::delete('/destroy/{id}', [PropertyController::class, 'destroy'])->name('destroy');
+    Route::delete('/delete/{id}', [PropertyController::class, 'destroy'])->name('destroy');
     Route::get('/show/{id}', [PropertyController::class, 'show'])->name('show');
 });
 // =======================================================
@@ -47,3 +49,7 @@ Route::prefix('admin/teams')->name('admin.team.')->group(function () {
 // =======================================================
 
 
+
+
+Route::get('/openai-chat', [OpenAiChatController::class, 'index'])->name('admin.aichat');
+Route::post('/openai-chat/send', [OpenAiChatController::class, 'send'])->name('openai.send');

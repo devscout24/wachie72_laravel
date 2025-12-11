@@ -10,8 +10,10 @@ class PropertySeeder extends Seeder
     public function run(): void
     {
         $images = [
-            'uploads/properties/2.jpg',
-            'uploads/properties/1.jpg'
+            'uploads/properties/001.jpg',
+            'uploads/properties/002.jpg',
+            'uploads/properties/003.jpg',
+            'uploads/properties/004.jpg',
         ];
 
         Property::updateOrCreate(

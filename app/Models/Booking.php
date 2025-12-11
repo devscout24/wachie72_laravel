@@ -11,7 +11,34 @@ class Booking extends Model
         'user_id',
         'start_date',
         'end_date',
+
+        // Guests
+        'adults',
+        'children',
+
+        // Customer Info
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+
+        // Address
+        'address',
+        'city',
+        'country',
+        'postal_code',
+
+        'comments',
+
+        // Price
+        'nightly_price',
+        'cleaning_fee',
+        'booking_fee',
         'total_price',
+
+        // Payment
+        'payment_gateway',
+        'payment_status'
     ];
 
     public function property()
@@ -23,6 +50,4 @@ class Booking extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    
 }

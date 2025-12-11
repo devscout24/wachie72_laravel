@@ -94,6 +94,8 @@ class PropertyController extends Controller
                     'property_id' => $property->id,
                     'image'       => $path . $name,
                 ]);
+
+                unset($path, $name);
             }
         }
 
@@ -174,9 +176,30 @@ class PropertyController extends Controller
 
     public function destroy($id)
     {
-        Property::findOrFail($id)->delete();
-        return response()->json(['message' => "Deleted Successfully"]);
+        $property = Property::with('images')->findOrFail($id);
+
+        // Delete images from public folder
+        if ($property->images->count() > 0) {
+            foreach ($property->images as $img) {
+                if (file_exists(public_path($img->image))) {
+                    @unlink(public_path($img->image));
+                }
+            }
+        }
+
+        // Delete related multiple images records
+        $property->images()->delete();
+
+        // Detach amenities
+        $property->amenities()->detach();
+
+        // Delete the property itself
+        $property->delete();
+
+        return response()->json(['message' => 'Property deleted successfully']);
     }
+
+
 
     //     public function toggleStatus($id)
     // {
@@ -193,4 +216,5 @@ class PropertyController extends Controller
     //         'status'  => $news->status
     //     ]);
     // }
+    
 }

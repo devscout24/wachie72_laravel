@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\api\AiChatController;
 use App\Http\Controllers\api\AmenityController;
+use App\Http\Controllers\api\BookingAddressController;
 use App\Http\Controllers\api\BookingController;
 use App\Http\Controllers\api\PropertyController;
 use App\Http\Controllers\api\ReviewsController;
@@ -65,6 +67,7 @@ Route::get('review/index', [ReviewsController::class, 'index']);
 // Booking Routes
 Route::post('booking/store', [BookingController::class, 'store']);
 Route::get('booking/all', [BookingController::class, 'getAll']);
+Route::post('booking/only', [BookingController::class, 'onlybooking']);
 
 
 // team routes can be added here
@@ -78,3 +81,11 @@ Route::get('stripe/checkout/{bookingId}', [StripeController::class, 'checkout'])
 Route::post('stripe/payment', [StripeController::class, 'payment']);
 Route::post('stripe/payment-booking', [StripeController::class, 'paymentBooking']);
 Route::get('stripe/success', [StripeController::class, 'success'])->name('payment.success');
+
+
+// booking address routes can be added here
+Route::post('booking/address/', [BookingAddressController::class, 'BookingAddressStore']);
+
+
+// OpenAI Chat Routes
+Route::post('/openai-chat/send', [AiChatController::class, 'send'])->name('openai.send');

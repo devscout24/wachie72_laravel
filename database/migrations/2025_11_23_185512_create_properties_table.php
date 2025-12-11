@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('bedrooms')->default(0);
             $table->integer('bathrooms')->default(0);
             $table->integer('max_guests')->default(0);
+            $table->integer('max_children')->default(0);
             $table->foreignId('amenity_id')->nullable();
             $table->text('description')->nullable();
             $table->string('image')->default('default.png');

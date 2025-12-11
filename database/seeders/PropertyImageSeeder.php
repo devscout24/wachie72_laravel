@@ -18,7 +18,10 @@ class PropertyImageSeeder extends Seeder
             ['id' => 1],
             [
                 'property_id' => 1,
-                'image'       => 'uploads/properties/2.jpg',
+                'image'       => 'uploads/properties/001.jpg',
+                'image'       => 'uploads/properties/003.jpg',
+                'image'       => 'uploads/properties/004.jpg',
+                'image'       => 'uploads/properties/002.jpg'
             ]
         );
 
@@ -26,7 +29,10 @@ class PropertyImageSeeder extends Seeder
             ['id' => 2],
             [
                 'property_id' => 1,
-                'image'       => 'uploads/properties/1.jpg',
+                'image'       => 'uploads/properties/001.jpg',
+                'image'       => 'uploads/properties/003.jpg',
+                'image'       => 'uploads/properties/004.jpg',
+                'image'       => 'uploads/properties/002.jpg'
             ]
         );
 
@@ -34,14 +40,20 @@ class PropertyImageSeeder extends Seeder
             ['id' => 3],
             [
                 'property_id' => 2,
-                'image'       => 'uploads/properties/2.jpg',
+                'image'       => 'uploads/properties/001.jpg',
+                'image'       => 'uploads/properties/003.jpg',
+                'image'       => 'uploads/properties/004.jpg',
+                'image'       => 'uploads/properties/002.jpg'
             ]
         );
         PropertyMultipleImage::updateOrCreate(
             ['id' => 4],
             [
                 'property_id' => 2,
-                'image'       => 'uploads/properties/1.jpg',
+                'image'       => 'uploads/properties/001.jpg',
+                'image'       => 'uploads/properties/003.jpg',
+                'image'       => 'uploads/properties/004.jpg',
+                'image'       => 'uploads/properties/002.jpg'
             ]
         );
     }

@@ -20,8 +20,8 @@ class TeamController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'designation' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'bio' => 'nullable|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'bio' => 'required|string',
         ]);
 
         $team = new Team();
@@ -35,9 +35,7 @@ class TeamController extends Controller
         }
 
         $team->is_active = $request->has('is_active') ? 1 : 0;
-
         $team->save();
-
         return redirect()->route('admin.team.index')->with('success', 'Team member added successfully.');
     }
 
@@ -51,6 +49,7 @@ class TeamController extends Controller
                 ->addColumn('image', function ($team) {
                     return '<img src="' . asset($team->image) . '" width="50" height="50">';
                 })
+
                 ->addColumn('status', function ($team) {
                     return $team->is_active
                         ? '<span class="badge bg-success">Active</span>'
@@ -65,7 +64,7 @@ class TeamController extends Controller
                         class="btn btn-danger btn-sm">Delete</a>
                 ';
                 })
-                ->rawColumns(['image', 'status', 'action'])
+                ->rawColumns(['name', 'designation','bio','image', 'status', 'action'])
                 ->make(true);
         }
 
@@ -95,9 +94,9 @@ class TeamController extends Controller
         $team->bio = $request->bio;
 
         if ($request->hasFile('image')) {
-            $imageName = time().'.'.$request->image->extension();
+            $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images/teams'), $imageName);
-            $team->image = 'images/teams/'.$imageName;
+            $team->image = 'images/teams/' . $imageName;
         }
 
         $team->is_active = $request->is_active; // FIXED
