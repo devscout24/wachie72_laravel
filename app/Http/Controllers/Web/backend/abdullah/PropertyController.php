@@ -83,6 +83,7 @@ class PropertyController extends Controller
 
         $property = Property::create($data);
 
+
         // Save multiple images
         if ($request->hasFile('multiple_image')) {
             foreach ($request->file('multiple_image') as $file) {

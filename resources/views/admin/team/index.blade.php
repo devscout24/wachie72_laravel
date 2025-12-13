@@ -8,7 +8,7 @@
 
     <div class="card">
         <div class="card-body">
-            <table id="teamTable" class="table table-striped table-hover table-bordered w-100">
+            <table id="teamTable" class="table table-hover table-bordered w-100">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -29,55 +29,66 @@
     <script>
         $(function() {
 
-            $('#teamTable').DataTable({
+            let table = $('#teamTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('admin.team.index') }}',
                 columns: [{
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false
                     },
                     {
-                        data: 'name',
-                        name: 'name'
+                        data: 'name'
                     },
                     {
                         data: 'image',
-                        name: 'image',
                         orderable: false,
                         searchable: false
                     },
                     {
-                        data: 'designation',
-                        name: 'designation'
+                        data: 'designation'
                     },
                     {
                         data: 'bio',
-                        name: 'bio',
                         orderable: false
                     },
                     {
-                        data: 'status',
-                        name: 'status',
+                        data: 'is_active',
                         orderable: false
                     },
                     {
                         data: 'action',
-                        name: 'action',
                         orderable: false,
                         searchable: false
                     }
                 ]
             });
 
-            // Delete confirmation
-            $(document).on('click', '.delete-button', function(e) {
-                e.preventDefault();
-                if (confirm('Are you sure you want to delete this team member?')) {
-                    $(this).closest('form').submit();
-                }
+            // DELETE
+            $(document).on('click', '.delete-btn', function() {
+                let id = $(this).data('id');
+
+                if (!confirm('Are you sure you want to delete this team member?')) return;
+
+                $.ajax({
+                    url: '/admin/teams/delete/' + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            table.ajax.reload(null, false);
+                            alert(res.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                        alert('Delete failed! Check console.');
+                    }
+
+                });
             });
 
         });

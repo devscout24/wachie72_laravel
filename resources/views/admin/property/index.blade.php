@@ -87,7 +87,7 @@
 
                 $.ajax({
                     url: "{{ url('admin/properties/delete') }}/" +
-                    id, // match your route: /delete/{id}
+                        id, // match your route: /delete/{id}
                     type: 'DELETE',
                     data: {
                         _token: "{{ csrf_token() }}"

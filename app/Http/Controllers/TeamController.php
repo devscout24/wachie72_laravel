@@ -3,41 +3,77 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Traits\apiresponse;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 
 class TeamController extends Controller
 {
+    use apiresponse;
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $teams = Team::latest()->get();
-
-            return DataTables::of($teams)
+            $data = Team::latest()->get();
+            return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('image', function ($team) {
-                    return '<img src="' . asset($team->image) . '" width="50" height="50" style="object-fit:cover;border-radius:5px;">';
+                ->addColumn('is_active', function ($row) {
+                    return $row->is_active ? 'Active' : 'Inactive';
                 })
-                ->addColumn('status', function ($team) {
-                    return $team->is_active
-                        ? '<span class="badge bg-success">Active</span>'
-                        : '<span class="badge bg-danger">Inactive</span>';
+                ->addColumn('image', function ($row) {
+                    if ($row->image) {
+                        $img = asset($row->image);
+                        return '<img src="' . $img . '" style="width:80px;height:80px;object-fit:cover;border-radius:50%;">';
+                    }
+                    return 'No Image';
                 })
-                ->addColumn('action', function ($team) {
-                    return '
-                        <a href="' . route('admin.team.edit', $team->id) . '" class="btn btn-warning btn-sm">Edit</a>
+                ->addColumn('designation', function ($row) {
+                    return $row->designation;
+                })
 
-                        <form action="' . route('admin.team.delete', $team->id) . '" method="POST" style="display:inline;">
-                            '.csrf_field().method_field("DELETE").'
-                            <button type="submit" class="btn btn-danger btn-sm delete-button">Delete</button>
-                        </form>
-                    ';
+
+                ->addColumn('bio', function ($row) {
+                    return Str::limit(strip_tags($row->bio), 80);
                 })
-                ->rawColumns(['image', 'status', 'action'])
+
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-primary btn-sm edit">Edit</a>';
+                    $btn = $btn . ' <a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-danger btn-sm delete-btn">Delete</a>';
+                    return $btn;
+                })
+                ->rawColumns(['is_active', 'image', 'action'])
                 ->make(true);
         }
-
         return view('admin.team.index');
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'designation' => 'required|string|max:255',
+            'bio' => 'nullable|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $team = new Team();
+        $team->name = $request->name;
+        $team->designation = $request->designation;
+        $team->bio = $request->bio;
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '_' . ($request->name) . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move(public_path('uploads/teams'), $imageName);
+            $team->image = 'uploads/teams/' . $imageName;
+        }
+
+        $team->is_active = $request->has('is_active') ? true : false;
+        $team->save();
+
+        return redirect()->route('admin.team.index')->with('success', 'Team Created');
     }
 
     public function create()
@@ -45,72 +81,67 @@ class TeamController extends Controller
         return view('admin.team.create');
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'designation' => 'required|string|max:255',
-            'image'       => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'bio'         => 'required|string',
-            'is_active'   => 'required',
-        ]);
-
-        // ensure folder exists
-        if (!file_exists(public_path('images/teams'))) {
-            mkdir(public_path('images/teams'), 0777, true);
-        }
-
-        $imageName = time() . '.' . $request->image->extension();
-        $request->image->move(public_path('images/teams'), $imageName);
-
-        Team::create([
-            'name'        => $request->name,
-            'designation' => $request->designation,
-            'bio'         => $request->bio,
-            'image'       => 'images/teams/' . $imageName,
-            'is_active'   => $request->is_active,
-        ]);
-
-        return redirect()->route('admin.team.index')->with('success', 'Team member added successfully.');
-    }
 
     public function edit($id)
     {
-        $team = Team::findOrFail($id);
-        return view('admin.team.edit', compact('team'));
+        $team = Team::find($id);
+        if (!$team) {
+            return $this->error(false, 'Team member not found', null, 404);
+        }
+        return $this->success(true, 'Team member retrieved successfully', $team, 200);
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'designation' => 'required|string|max:255',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'bio'         => 'required|string',
-            'is_active'   => 'required',
-        ]);
-
-        $team = Team::findOrFail($id);
-
-        if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images/teams'), $imageName);
-            $team->image = 'images/teams/' . $imageName;
+        $team = Team::find($id);
+        if (!$team) {
+            return $this->error(false, 'Team member not found', null, 404);
         }
 
         $team->name = $request->name;
-        $team->designation = $request->designation;
-        $team->bio = $request->bio;
-        $team->is_active = $request->is_active;
+        $team->role = $request->role;
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '_' . ($request->name) . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move(public_path('uploads/teams'), $imageName);
+            $team->image = 'uploads/teams/' . $imageName;
+        }
         $team->save();
 
-        return redirect()->route('admin.team.index')->with('success', 'Team member updated successfully.');
+        return $this->success(true, 'Team member updated successfully', $team, 200);
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
-        Team::findOrFail($id)->delete();
-        return redirect()->back()->with('success', 'Team member deleted successfully.');
+        try {
+            $team = Team::find($id);
+
+            if (!$team) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team member not found'
+                ], 404);
+            }
+
+            // Safe image delete
+            if (!empty($team->image)) {
+                $imagePath = public_path($team->image);
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+
+            $team->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Team member deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
-

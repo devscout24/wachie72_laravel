@@ -36,8 +36,8 @@
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Status</label>
-                        <select name="is_active" class="form-select">
-                            <option value="1" selected>Active</option>
+                        <select name="is_active" class="form-select" required>
+                            <option value="1">Active</option>
                             <option value="0">Inactive</option>
                         </select>
                     </div>
@@ -53,6 +53,7 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
             $('.summernote').summernote({
