@@ -42,7 +42,7 @@ Route::prefix('admin/teams')->name('admin.team.')->group(function () {
     Route::get('/create', [TeamController::class, 'create'])->name('create');
     Route::post('/store', [TeamController::class, 'store'])->name('store');
     Route::get('/edit/{id}', [TeamController::class, 'edit'])->name('edit');
-    Route::post('/update/{id}', [TeamController::class, 'update'])->name('update');
+    Route::put('/update/{id}', [TeamController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [TeamController::class, 'destroy'])->name('destroy');
 });
 

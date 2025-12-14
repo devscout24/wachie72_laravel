@@ -16,33 +16,38 @@ class PropertyController extends Controller
 
     public function index()
     {
-        $properties = Property::with('amenities:id,name')
+        $properties = Property::with(['amenities:id,name', 'images'])
             ->orderBy('id', 'desc')
             ->get()
             ->map(function ($item) {
 
-                $multipleImages = is_string($item->multiple_image)
-                    ? json_decode($item->multiple_image, true)
-                    : ($item->multiple_image ?? []);
+                // ✅ MULTIPLE IMAGE FROM RELATION
+                $item->multiple_image = $item->images->map(function ($img) {
+                    return url($img->image);
+                })->values();
 
-                $item->multiple_image = collect($multipleImages)
-                    ->map(fn($img) => asset('uploads/properties/' . basename($img)))
-                    ->values();
+                // ✅ STRIP TAG DESCRIPTION
+                $item->description = strip_tags($item->description);
+
+                // optional: hide relation
+                unset($item->images);
 
                 return $item;
             });
 
         return response()->json([
             'success' => true,
-            'data' => $properties,
+            'data'    => $properties,
             'message' => 'Properties retrieved successfully'
-        ]);
+        ], 200);
     }
+
+
 
 
     public function getone($id)
     {
-        $property = Property::with('amenities:id,name')->find($id);
+        $property = Property::with(['amenities:id,name', 'images'])->find($id);
 
         if (!$property) {
             return response()->json([
@@ -51,23 +56,21 @@ class PropertyController extends Controller
             ], 404);
         }
 
-        // --- FIX JSON IMAGE FIELDS ---
-        // Always decode if saved as string
-        $multipleImages = is_string($property->multiple_image)
-            ? json_decode($property->multiple_image, true)
-            : ($property->multiple_image ?? []);
+        // ✅ MULTIPLE IMAGE FROM RELATION
+        $property->multiple_image = $property->images->map(function ($img) {
+            return url($img->image);
+        })->values();
 
-        // Convert each image path to full URL
-        $property->multiple_image = collect($multipleImages)
-            ->map(fn($img) => asset($img))
-            ->values(); // reset index (optional)
+        // ✅ STRIP TAG DESCRIPTION
+        $property->description = strip_tags($property->description);
+
+        // optional: remove images relation from response
+        unset($property->images);
 
         return response()->json([
             'success' => true,
-            'data' => $property,
+            'data'    => $property,
             'message' => 'Property retrieved successfully'
-        ]);
+        ], 200);
     }
-
-    
 }

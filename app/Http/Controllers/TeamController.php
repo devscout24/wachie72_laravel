@@ -40,7 +40,7 @@ class TeamController extends Controller
                 })
 
                 ->addColumn('action', function ($row) {
-                    $btn = '<a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-primary btn-sm edit">Edit</a>';
+                    $btn = '<a href="' . route('admin.team.edit', $row->id) . '" class="btn btn-primary btn-sm">Edit</a>';
                     $btn = $btn . ' <a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-danger btn-sm delete-btn">Delete</a>';
                     return $btn;
                 })
@@ -84,32 +84,35 @@ class TeamController extends Controller
 
     public function edit($id)
     {
-        $team = Team::find($id);
-        if (!$team) {
-            return $this->error(false, 'Team member not found', null, 404);
-        }
-        return $this->success(true, 'Team member retrieved successfully', $team, 200);
+        $team = Team::findOrFail($id);
+        return view('admin.team.edit', compact('team'));
     }
+
 
     public function update(Request $request, $id)
     {
-        $team = Team::find($id);
-        if (!$team) {
-            return $this->error(false, 'Team member not found', null, 404);
-        }
+        $team = Team::findOrFail($id);
 
         $team->name = $request->name;
-        $team->role = $request->role;
+        $team->designation = $request->designation;
+        $team->bio = $request->bio;
+        $team->is_active = $request->is_active;
 
         if ($request->hasFile('image')) {
-            $imageName = time() . '_' . ($request->name) . '.' . $request->image->getClientOriginalExtension();
+            if ($team->image && file_exists(public_path($team->image))) {
+                unlink(public_path($team->image));
+            }
+
+            $imageName = time() . '_' . $request->name . '.' . $request->image->getClientOriginalExtension();
             $request->image->move(public_path('uploads/teams'), $imageName);
             $team->image = 'uploads/teams/' . $imageName;
         }
+
         $team->save();
 
-        return $this->success(true, 'Team member updated successfully', $team, 200);
+        return redirect()->route('admin.team.index')->with('success', 'Team member updated successfully');
     }
+
 
     public function destroy($id)
     {
