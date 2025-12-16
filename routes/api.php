@@ -7,6 +7,8 @@ use App\Http\Controllers\api\BookingController;
 use App\Http\Controllers\api\PropertyController;
 use App\Http\Controllers\api\ReviewsController;
 use App\Http\Controllers\api\StripeController;
+use App\Http\Controllers\api\StripePaymentController;
+use App\Http\Controllers\api\StripeWebhookController;
 use App\Http\Controllers\api\TeamController;
 use App\Http\Controllers\api\UserAuthBDController;
 use App\Http\Controllers\API\UserAuthController;
@@ -75,12 +77,12 @@ Route::get('team/all', [TeamController::class, 'getAll']);
 Route::get('team/{id}', [TeamController::class, 'getOne']);
 
 
-// Stripe Payment Routes
-Route::get('stripe/checkout/{bookingId}', [StripeController::class, 'checkout']);
+// // Stripe Payment Routes
+// Route::get('stripe/checkout/{bookingId}', [StripeController::class, 'checkout']);
 
-Route::post('stripe/payment', [StripeController::class, 'payment']);
-Route::post('stripe/payment-booking', [StripeController::class, 'paymentBooking']);
-Route::get('stripe/success', [StripeController::class, 'success'])->name('payment.success');
+// Route::post('stripe/payment', [StripeController::class, 'payment']);
+// Route::post('stripe/payment-booking', [StripeController::class, 'paymentBooking']);
+// Route::get('stripe/success', [StripeController::class, 'success'])->name('payment.success');
 
 
 // booking address routes can be added here
@@ -89,3 +91,15 @@ Route::post('booking/address/', [BookingAddressController::class, 'BookingAddres
 
 // OpenAI Chat Routes
 Route::post('/openai-chat/send', [AiChatController::class, 'send'])->name('openai.send');
+
+
+
+// stripe payment routes can be added here
+Route::middleware('auth:sanctum')->group(function () {
+    // Route::post('/booking', [BookingController::class, 'createBooking']);
+    Route::post('/booking/checkout', [StripePaymentController::class, 'checkoutBooking']);
+});
+
+
+
+Route::post('/stripe/webhook', [StripePaymentController::class, 'handle']);
