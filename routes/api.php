@@ -56,8 +56,9 @@ Route::get('amenity/getone/{id}', [AmenityController::class, 'getone']);
 
 
 // Property Routes
-Route::get('property/index', [PropertyController::class, 'index']);
+Route::get('properties', [PropertyController::class, 'index']);
 Route::get('property/getone/{id}', [PropertyController::class, 'getone']);
+Route::get('property/booking', [PropertyController::class, 'booking']);
 
 
 // Review Routes
@@ -77,12 +78,11 @@ Route::get('team/all', [TeamController::class, 'getAll']);
 Route::get('team/{id}', [TeamController::class, 'getOne']);
 
 
-// // Stripe Payment Routes
-// Route::get('stripe/checkout/{bookingId}', [StripeController::class, 'checkout']);
-
-// Route::post('stripe/payment', [StripeController::class, 'payment']);
-// Route::post('stripe/payment-booking', [StripeController::class, 'paymentBooking']);
-// Route::get('stripe/success', [StripeController::class, 'success'])->name('payment.success');
+// Stripe Payment Routes
+Route::get('stripe/checkout/{bookingId}', [StripeController::class, 'checkout']);
+Route::get('/stripe-success', [StripeController::class, 'success']);
+Route::get('/stripe-cancel', [StripeController::class, 'cancel']);
+Route::post('stripe/verify-payment', [StripeController::class, 'verifyPayment']);
 
 
 // booking address routes can be added here
@@ -95,10 +95,10 @@ Route::post('/openai-chat/send', [AiChatController::class, 'send'])->name('opena
 
 
 // stripe payment routes can be added here
-Route::middleware('auth:sanctum')->group(function () {
-    // Route::post('/booking', [BookingController::class, 'createBooking']);
-    Route::post('/booking/checkout', [StripePaymentController::class, 'checkoutBooking']);
-});
+// Route::middleware('auth:sanctum')->group(function () {
+//     // Route::post('/booking', [BookingController::class, 'createBooking']);
+//     Route::post('/booking/checkout', [StripePaymentController::class, 'checkoutBooking']);
+// });
 
 
 

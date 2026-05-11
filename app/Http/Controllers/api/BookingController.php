@@ -27,16 +27,12 @@ class BookingController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error(
-                $validator->errors(),
-                'Validation failed',
-                422
-            );
+            return $this->error($validator->errors(), 'Validation failed', 422);
         }
 
         $property = Property::findOrFail($request->property_id);
 
-        // Calculate nights
+        // 🗓 Calculate nights
         $startDate = Carbon::parse($request->start_date);
         $endDate   = Carbon::parse($request->end_date);
         $nights    = $startDate->diffInDays($endDate);
@@ -48,37 +44,49 @@ class BookingController extends Controller
             ], 422);
         }
 
-        // Price calculations
-        $pricePerNight  = $property->price;         // e.g., 350
-        $priceTotal     = $pricePerNight * $nights; // e.g., 1050
-        $cleaning_fee   = $property->cleaning_fee;  // e.g., 200
-        $booking_fee    = $priceTotal * 0.045;      // 4.5%
-        $total          = $priceTotal + $cleaning_fee + $booking_fee;
+        // 💰 Price calculations
+        $pricePerNight = $property->price;
+        $priceTotal    = $pricePerNight * $nights;
+        $cleaningFee   = $property->cleaning_fee;
+        $bookingFee    = round($priceTotal * 0.045, 2);
+        $total         = $priceTotal + $cleaningFee + $bookingFee;
 
-        /** STORE THE BOOKING */
+        // ✅ STORE FULL BOOKING + PRICES
         $booking = Booking::create([
-            'property_id' => $request->property_id,
-            'user_id'     => auth()->id(),
-            'start_date'  => $request->start_date,
-            'end_date'    => $request->end_date,
-            'adults'      => $request->adults,
-            'children'    => $request->children ?? 0,
+            'property_id'      => $property->id,
+            'user_id'          => auth()->id(),
+            'start_date'       => $request->start_date,
+            'end_date'         => $request->end_date,
+            'adults'           => $request->adults,
+            'children'         => $request->children ?? 0,
+
+            // 🔑 PRICE DATA (VERY IMPORTANT)
+            'nights'           => $nights,
+            'price_per_night'  => $pricePerNight,
+            'price_total'      => $priceTotal,
+            'cleaning_fee'     => $cleaningFee,
+            'booking_fee'      => $bookingFee,
+            'total_price'      => $total,
+
+            'payment_status'   => 'pending',
         ]);
 
-        // JSON response matching your screenshot format
-        $priceKey = 'price_' . $nights . '_nights';
-
+        // ✅ API RESPONSE (frontend friendly)
         return response()->json([
             'success' => true,
             'data' => [
-                'booking_id'     => $booking->id,
-                $priceKey        => 'A$ ' . number_format($pricePerNight, 2) . ' × ' . $nights . ' night',
-                'cleaning_fee'   => 'A$ ' . number_format($cleaning_fee, 2),
-                'booking_fee'    => 'A$ ' . number_format($booking_fee, 2),
-                'total'          => 'A$ ' . number_format($total, 2),
+                'booking_id'       => $booking->id,
+                'nights'           => $nights,
+                'price_per_night'  => $pricePerNight,
+                'price_total'      => $priceTotal,
+                'cleaning_fee'     => $cleaningFee,
+                'booking_fee'      => $bookingFee,
+                'total_price'      => $total,
+                'currency'         => 'USD',
             ]
         ], 201);
     }
+
 
 
 
@@ -128,4 +136,6 @@ class BookingController extends Controller
             ]
         ]);
     }
+
+    
 }

@@ -12,6 +12,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.6.4",
         "spatie/laravel-permission": "^6.23",
+        "stripe/stripe-php": "^19.1",
         "tymon/jwt-auth": "^2.2",
         "yajra/laravel-datatables-oracle": "11.0"
     },
@@ -67,6 +68,9 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform": {
+            "php": "8.2.0"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true

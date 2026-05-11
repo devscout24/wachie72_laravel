@@ -31,14 +31,14 @@ class Booking extends Model
         'comments',
 
         // Price
-        'nightly_price',
+        'nights',
+        'price_per_night',
+        'price_total',
         'cleaning_fee',
         'booking_fee',
         'total_price',
-
-        // Payment
-        'payment_gateway',
-        'payment_status'
+        'payment_status',
+        'stripe_session_id',
     ];
 
     public function property()
@@ -51,7 +51,7 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 
-    
+
     public function order()
     {
         return $this->hasOne(Order::class);
